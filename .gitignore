@@ -1,0 +1,15 @@
+# Dependências e ambientes locais
+/vendor/
+.env
+.DS_Store
+Thumbs.db
+
+# Credenciais e dados sensíveis
+config/database_local.php
+
+# Pastas de uploads de utilizadores (mantém apenas a estrutura)
+uploads/perfil/*
+!uploads/perfil/.gitkeep
+
+# Logs e arquivos temporários do servidor
+*.log
