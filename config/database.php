@@ -1,11 +1,11 @@
 <?php
-// Configuração da Base de Dados PostgreSQL (Local / Produção)
+// Configuração da Base de Dados PostgreSQL (Supabase / Render)
 
-$host = getenv('DB_HOST') ?: 'localhost';
+$host = getenv('DB_HOST') ?: 'db.fagcwofynoxtplwhpvaz.supabase.co';
 $port = getenv('DB_PORT') ?: '5432';
-$dbname = getenv('DB_NAME') ?: 'financia_db';
+$dbname = getenv('DB_NAME') ?: 'postgres';
 $user = getenv('DB_USER') ?: 'postgres';
-$password = getenv('DB_PASS') ?: '878175';
+$password = getenv('DB_PASS') ?: '87817533Ra.'; // Insira a sua senha do Supabase
 
 try {
     $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
@@ -14,6 +14,5 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 } catch (PDOException $e) {
-    // Em produção ou desenvolvimento, exibe a mensagem de erro com segurança
     die("Erro ao conectar com o banco de dados: " . $e->getMessage());
 }
