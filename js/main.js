@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const header = document.querySelector(".app-header") || document.querySelector(".app-main-content");
     if (header && !document.querySelector(".mobile-menu-toggle")) {
         const toggleBtn = document.createElement("button");
-        toggleBtn.innerHTML = "☰ Menu";
+        toggleBtn.innerHTML = "☰";
         toggleBtn.className = "mobile-menu-toggle";
         
         // Insere o botão no topo da área principal

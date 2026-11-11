@@ -1649,46 +1649,83 @@ a {
 }
 
 /* ========================================================
-   ETAPA 2: MENU HAMBÚRGUER E SIDEBAR MOBILE
+   AJUSTES FINAIS: BOTÃO HAMBÚRGUER REDONDO & LANDING PAGE
    ======================================================== */
 
-/* Botão hambúrguer (invisível no desktop por padrão) */
-.mobile-menu-toggle {
-    display: none;
-    background: var(--navy-main);
-    color: #ffffff;
-    border: none;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 18px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 700;
-}
-
 @media (max-width: 900px) {
-    /* Mostra o botão no telemóvel */
+    /* Estilização moderna do Botão Hambúrguer (Ícone de 3 listas em círculo) */
     .mobile-menu-toggle {
-        display: inline-flex;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        background-color: var(--navy-main);
+        color: #ffffff;
+        border: none;
+        border-radius: 50%; /* Transforma num círculo perfeito */
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(17, 45, 66, 0.2);
+        transition: 0.2s;
     }
 
-    /* Oculta a sidebar por padrão no telemóvel */
+    .mobile-menu-toggle:hover {
+        background-color: var(--emerald-main);
+    }
+
+    /* Correção do estouro na Landing Page e grades gerais */
+    .landing-container, 
+    .landing-navbar, 
+    .hero-section, 
+    .features-section, 
+    .faq-section {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-section {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        padding: 30px 0 !important;
+    }
+
+    .hero-title {
+        font-size: 28px !important;
+        letter-spacing: -0.5px !important;
+    }
+
+    .hero-desc {
+        font-size: 15px !important;
+    }
+
+    /* Comportamento retrátil da Sidebar no Mobile */
+    .app-wrapper {
+        flex-direction: column !important;
+        position: relative;
+    }
+
     .app-sidebar {
         display: none !important;
         width: 100% !important;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        z-index: 999;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        border-radius: 0 0 16px 16px;
     }
 
-    /* Quando ativada via JavaScript, a sidebar aparece empilhada */
     .app-sidebar.mobile-open {
         display: flex !important;
     }
 
-    /* Ajuste do cabeçalho interno para acomodar o botão */
-    .app-header {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+    .app-main-content {
+        padding: 16px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }
