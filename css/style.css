@@ -341,3 +341,43 @@ a {
         padding: 20px 16px;
     }
 }
+
+/* CORREÇÃO DEFINITIVA PARA ZOOM E LARGURA MOBILE */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    .landing-navbar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+
+    .landing-menu {
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 13px;
+    }
+
+    .landing-container, .hero-section {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .hero-title {
+        font-size: 28px !important;
+        letter-spacing: -0.5px;
+    }
+
+    /* Ajuste dos cards do dashboard no telemóvel */
+    .app-main-content {
+        padding: 12px !important;
+    }
+
+    .kpi-card, .dashboard-card-box {
+        padding: 16px !important;
+    }
+}
