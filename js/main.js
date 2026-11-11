@@ -68,3 +68,27 @@ window.renderLucideIcons = function() {
     }
 };
 
+/* ========================================================
+   ETAPA 2: CONTROLO DO MENU MOBILE (TOGGLE)
+   ======================================================== */
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.querySelector(".app-sidebar");
+    
+    // Cria o botão hambúrguer dinamicamente se ele não existir no HTML
+    const header = document.querySelector(".app-header") || document.querySelector(".app-main-content");
+    if (header && !document.querySelector(".mobile-menu-toggle")) {
+        const toggleBtn = document.createElement("button");
+        toggleBtn.innerHTML = "☰ Menu";
+        toggleBtn.className = "mobile-menu-toggle";
+        
+        // Insere o botão no topo da área principal
+        header.prepend(toggleBtn);
+
+        toggleBtn.addEventListener("click", function () {
+            if (sidebar) {
+                sidebar.classList.toggle("mobile-open");
+            }
+        });
+    }
+});
+
