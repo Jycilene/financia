@@ -5,8 +5,8 @@ function garantirOcorrenciasMesAtual($pdo, $usuario_id) {
     $mesAtual = (int) date('m');
     $anoAtual = (int) date('Y');
 
-    // 1. Buscar todas as despesas fixas ativas do usuário
-    $stmt = $pdo->prepare("SELECT * FROM despesas_fixas WHERE usuario_id = :usuario_id AND ativo = TRUE");
+    // 1. Buscar todas as despesas fixas ativas do usuário (apenas compromissos recorrentes)
+    $stmt = $pdo->prepare("SELECT * FROM despesas_fixas WHERE usuario_id = :usuario_id AND ativo = TRUE AND (tipo_compromisso = 'recorrente' OR tipo_compromisso IS NULL)");
     $stmt->execute([':usuario_id' => $usuario_id]);
     $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -66,14 +66,6 @@ function verificarEGeraNotificacoes($pdo, $usuario_id) {
                 $check = $pdo->prepare("
                     SELECT id FROM notificacoes 
                     WHERE usuario_id = :uid 
-                      WILD pagamento_fixo_id = :pid 
-                      AND tipo = :tipo 
-                      AND DATE(created_at) = :hoje
-                ");
-                // Nota: corrigindo temporariamente o operador para PDO seguro abaixo
-                $check = $pdo->prepare("
-                    SELECT id FROM notificacoes 
-                    WHERE usuario_id = :uid 
                       AND pagamento_fixo_id = :pid 
                       AND tipo = :tipo 
                       AND DATE(created_at) = :hoje

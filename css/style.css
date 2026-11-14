@@ -1730,3 +1730,106 @@ a {
     }
 }
 
+/* ========================================================
+   AJUSTE FINO DE CARDS E MOBILE (FINANCIA)
+   ======================================================== */
+@media (max-width: 900px) {
+    /* Evita rolagem horizontal */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Contendor do cabeçalho */
+    .app-header, 
+    .app-main-content {
+        position: relative;
+    }
+
+    /* Botão Hambúrguer em Círculo Perfeito e Compacto */
+    .mobile-menu-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        background-color: var(--navy-main) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 50% !important;
+        font-size: 20px !important;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(17, 45, 66, 0.2);
+        margin-bottom: 12px;
+    }
+
+    .mobile-menu-toggle:hover {
+        background-color: var(--emerald-main) !important;
+    }
+
+    /* Correção do espaçamento e tamanho dos Cards do Dashboard para não ficarem gigantes */
+    .dashboard-card, 
+    .kpi-card, 
+    .card, 
+    .stat-card {
+        padding: 14px 16px !important;
+        margin-bottom: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        border-radius: 12px !important;
+    }
+
+    /* Reduz o tamanho exagerado dos números de saldo/valores no mobile para encaixar bem */
+    .dashboard-card h2, 
+    .kpi-card h2, 
+    .card h2,
+    .dashboard-card .value,
+    .kpi-card .value {
+        font-size: 24px !important;
+    }
+
+    /* Organiza a barra superior e campos de pesquisa */
+    .dashboard-top-bar, 
+    .user-top-bar, 
+    .top-bar-flex {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    input[type="search"], 
+    input[placeholder*="Buscar"] {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Comportamento retrátil da Sidebar no Mobile */
+    .app-wrapper {
+        flex-direction: column !important;
+        position: relative;
+    }
+
+    .app-sidebar {
+        display: none !important;
+        width: 100% !important;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        z-index: 999;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        border-radius: 0 0 16px 16px;
+        background-color: var(--navy-main);
+    }
+
+    .app-sidebar.mobile-open {
+        display: flex !important;
+    }
+
+    .app-main-content {
+        padding: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
