@@ -1,14 +1,7 @@
 <?php
-// 1. Inicia a sessão e protege a rota
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit;
-}
+// 1. Inicia e valida a sessão sincronizada com o banco
+require_once __DIR__ . '/includes/auth_check.php';
 
-require_once __DIR__ . '/config/database.php';
-
-$usuario_id = $_SESSION['usuario_id'];
 $mensagem = '';
 
 // 2. Verifica se o ID foi passado na URL
@@ -26,7 +19,7 @@ $stmt->execute([':id' => $id, ':usuario_id' => $usuario_id]);
 $movimentacao = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$movimentacao) {
-    header("Location: index.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -36,21 +29,13 @@ $categorias = $stmt_cat->fetchAll(PDO::FETCH_ASSOC);
 
 // 5. Salva as alterações (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $descricao         = trim($_POST['descricao'] ?? '');
-    $tipo              = trim($_POST['tipo'] ?? 'despesa');
-    $categoria_id      = (int) ($_POST['categoria_id'] ?? 0);
-    $data_movimentacao = trim($_POST['data_movimentacao'] ?? '');
+    $descricao         = trim($_POST['descricao']);
+    $valor             = str_replace(',', '.', trim($_POST['valor']));
+    $tipo              = $_POST['tipo'];
+    $categoria_id      = $_POST['categoria_id'];
+    $data_movimentacao = $_POST['data_movimentacao'];
 
-    // Tratamento robusto para valores numéricos e formatação de moeda brasileira
-    $valor_raw = trim($_POST['valor'] ?? '0');
-    $valor_limpo = preg_replace('/[^\d,\.]/', '', $valor_raw);
-    if (strpos($valor_limpo, ',') !== false) {
-        $valor_limpo = str_replace('.', '', $valor_limpo);
-        $valor_limpo = str_replace(',', '.', $valor_limpo);
-    }
-    $valor = (float) $valor_limpo;
-
-    if (empty($descricao) || $categoria_id <= 0 || empty($data_movimentacao)) {
+    if (empty($descricao) || empty($valor) || empty($tipo) || empty($categoria_id) || empty($data_movimentacao)) {
         $mensagem = "Por favor, preencha todos os campos!";
     } elseif ($valor <= 0) {
         $mensagem = "O valor deve ser maior que zero!";
@@ -75,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':usuario_id'        => $usuario_id
             ]);
 
-            header("Location: index.php");
+            header("Location: dashboard.php");
             exit;
 
         } catch (PDOException $e) {
@@ -90,71 +75,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinanCia - Editar Movimentação</title>
+    <!-- Certifique-se de que o caminho do CSS está correto -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div class="container">
-        <div class="form-card">
+    <div class="container" style="max-width: 600px; margin: 40px auto; padding: 20px;">
+        <div class="form-card" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
-            <div class="form-card-header">
-                <h2>Editar Movimentação ✏️</h2>
-                <a href="index.php" class="btn-cancelar" style="padding: 6px 12px; font-size: 13px;">✕ Fechar</a>
+            <div class="form-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #112d42; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="pencil" class="lucide-sm"></i>
+                    <span>Editar Movimentação</span>
+                </h2>
+                <a href="dashboard.php" class="btn-cancelar" style="padding: 6px 12px; font-size: 13px; text-decoration: none; color: #64748b; display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-lucide="x" class="lucide-sm"></i>
+                    <span>Fechar</span>
+                </a>
             </div>
 
             <?php if (!empty($mensagem)): ?>
-                <div class="alerta alerta-erro"><?php echo $mensagem; ?></div>
+                <div class="alerta alerta-erro" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="alert-circle" class="lucide-sm"></i>
+                    <span><?php echo $mensagem; ?></span>
+                </div>
             <?php endif; ?>
 
             <form action="" method="POST">
-                <div class="form-group">
-                    <label for="descricao">Descrição</label>
-                    <input type="text" id="descricao" name="descricao" class="form-control" value="<?php echo htmlspecialchars($movimentacao['descricao']); ?>" required>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="descricao" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px;">Descrição</label>
+                    <input type="text" id="descricao" name="descricao" class="form-control" value="<?php echo htmlspecialchars($movimentacao['descricao']); ?>" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="valor">Valor (R$)</label>
-                    <input type="number" id="valor" step="0.01" min="0.01" name="valor" class="form-control" value="<?php echo $movimentacao['valor']; ?>" required>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="valor" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px;">Valor (R$)</label>
+                    <input type="number" id="valor" step="0.01" min="0.01" name="valor" class="form-control" value="<?php echo $movimentacao['valor']; ?>" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="tipo">Tipo de Movimentação</label>
-                    <select id="tipo" name="tipo" class="form-control" required>
-                        <option value="despesa" <?php echo $movimentacao['tipo'] === 'despesa' ? 'selected' : ''; ?>>🔴 Despesa (Saída)</option>
-                        <option value="receita" <?php echo $movimentacao['tipo'] === 'receita' ? 'selected' : ''; ?>>🟢 Receita (Entrada)</option>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="tipo" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px;">Tipo de Movimentação</label>
+                    <select id="tipo" name="tipo" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                        <option value="despesa" <?php echo $movimentacao['tipo'] === 'despesa' ? 'selected' : ''; ?>>Despesa (Saída)</option>
+                        <option value="receita" <?php echo $movimentacao['tipo'] === 'receita' ? 'selected' : ''; ?>>Receita (Entrada)</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="categoria_id">Categoria</label>
-                    <select id="categoria_id" name="categoria_id" class="form-control" required>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="categoria_id" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px;">Categoria</label>
+                    <select id="categoria_id" name="categoria_id" class="form-control" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
                         <?php foreach ($categorias as $cat): ?>
                             <option value="<?php echo $cat['id']; ?>" <?php echo $movimentacao['categoria_id'] == $cat['id'] ? 'selected' : ''; ?>>
-                                <?php echo $cat['nome']; ?> (<?php echo ucfirst($cat['tipo']); ?>)
+                                <?php echo htmlspecialchars($cat['nome']); ?> (<?php echo ucfirst($cat['tipo']); ?>)
                             </option>
-                            <option value="<?php echo $cat['id']; ?>" data-tipo="<?php echo $cat['tipo']; ?>" <?php echo $movimentacao['categoria_id'] == $cat['id'] ? 'selected' : ''; ?>>
-    <?php echo $cat['nome']; ?>
-</option>
-
                         <?php endforeach; ?>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="data_movimentacao">Data da Movimentação</label>
-                    <input type="date" id="data_movimentacao" name="data_movimentacao" class="form-control" value="<?php echo $movimentacao['data_movimentacao']; ?>" required>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="data_movimentacao" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px;">Data da Movimentação</label>
+                    <input type="date" id="data_movimentacao" name="data_movimentacao" class="form-control" value="<?php echo $movimentacao['data_movimentacao']; ?>" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
                 </div>
 
-                <div class="btn-grupo">
-                    <button type="submit" class="btn-salvar">💾 Salvar Alterações</button>
-                    <a href="index.php" class="btn-cancelar">Cancelar</a>
+                <div class="btn-grupo" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-salvar" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="save" class="lucide-sm"></i>
+                        <span>Salvar Alterações</span>
+                    </button>
+                    <a href="dashboard.php" class="btn-cancelar" style="background: #e2e8f0; color: #334155; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="x" class="lucide-sm"></i>
+                        <span>Cancelar</span>
+                    </a>
                 </div>
             </form>
 
         </div>
     </div>
-
-       <script src="js/main.js"></script>
-                     
+    
+    <script src="js/lucide.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>
